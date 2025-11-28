@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * Configuration Template
+ * 
+ * Copy this file to config.php and fill in your SMTP credentials.
+ * Never commit config.php with real credentials to version control.
+ */
+
+$config = [
+    'host' => 'smtp.example.com',
+    'username' => 'your-email@example.com',
+    'password' => 'your-password',
+    'port' => 465,
+    'from' => 'your-email@example.com',
+    'encryption' => 'ssl', // 'ssl' or 'tls'
+    'require_https' => filter_var('true', FILTER_VALIDATE_BOOLEAN),
+];
+

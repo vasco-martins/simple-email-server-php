@@ -14,17 +14,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 
-// Configuration from environment variables or defaults
-$config = [
-    'host' =>  '',
-    'username' =>  '',
-    'password' =>  '',
-    'port' => (int)( 465),
-    'from' =>  '',
-    'encryption' =>  'ssl',
-    'require_https' => filter_var( 'true', FILTER_VALIDATE_BOOLEAN),
-];
-
+require 'config.php';
 require __DIR__ . '/phpmailer/src/Exception.php';
 require __DIR__ . '/phpmailer/src/PHPMailer.php';
 require __DIR__ . '/phpmailer/src/SMTP.php';
