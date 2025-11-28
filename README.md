@@ -5,7 +5,7 @@ A lightweight, secure PHP email server using PHPMailer for sending emails via SM
 ## Features
 
 - ✅ SMTP email sending via PHPMailer
-- ✅ Secure configuration using environment variables
+- ✅ Simple configuration using `config.php`
 - ✅ JSON API for easy integration
 - ✅ Support for HTML emails
 - ✅ File attachment support (base64 encoded)
@@ -16,7 +16,7 @@ A lightweight, secure PHP email server using PHPMailer for sending emails via SM
 ## Requirements
 
 - PHP >= 7.4
-- Composer
+- PHPMailer library (included in repository)
 - SMTP server credentials (Gmail, SendGrid, AWS SES, etc.)
 
 ## Installation
@@ -27,26 +27,27 @@ git clone https://github.com/vascomartins/simple-email-server-php.git
 cd simple-email-server-php
 ```
 
-2. Install dependencies:
+2. Configure your SMTP settings:
 ```bash
-composer install
+cp config.php.example config.php
 ```
 
-3. Configure your SMTP settings:
-```bash
-cp .env.example .env
+Then edit `config.php` with your SMTP credentials:
+```php
+<?php
+
+$config = [
+    'host' => 'smtp.gmail.com',
+    'username' => 'your-email@gmail.com',
+    'password' => 'your-app-password',
+    'port' => 465,
+    'from' => 'your-email@gmail.com',
+    'encryption' => 'ssl',
+    'require_https' => filter_var('true', FILTER_VALIDATE_BOOLEAN),
+];
 ```
 
-Edit `.env` with your SMTP credentials:
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_USERNAME=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-SMTP_PORT=465
-SMTP_FROM=your-email@gmail.com
-SMTP_ENCRYPTION=ssl
-REQUIRE_HTTPS=true
-```
+**Important:** Never commit your `config.php` file with real credentials. The `config.php.example` file is provided as a template.
 
 ## Usage
 
@@ -125,49 +126,70 @@ fetch('https://your-domain.com/server.php', {
 
 ## Configuration
 
-### Environment Variables
+### Configuration Options
 
-| Variable | Description | Required | Default |
-|----------|-------------|----------|---------|
-| `SMTP_HOST` | SMTP server hostname | Yes | - |
-| `SMTP_USERNAME` | SMTP username/email | Yes | - |
-| `SMTP_PASSWORD` | SMTP password/app password | Yes | - |
-| `SMTP_PORT` | SMTP server port | No | 465 |
-| `SMTP_FROM` | From email address | Yes | - |
-| `SMTP_ENCRYPTION` | Encryption type (`ssl` or `tls`) | No | ssl |
-| `REQUIRE_HTTPS` | Enforce HTTPS connections | No | true |
+Edit `config.php` to set up your SMTP server:
+
+| Option | Description | Required | Default |
+|--------|-------------|----------|---------|
+| `host` | SMTP server hostname | Yes | - |
+| `username` | SMTP username/email | Yes | - |
+| `password` | SMTP password/app password | Yes | - |
+| `port` | SMTP server port | No | 465 |
+| `from` | From email address | Yes | - |
+| `encryption` | Encryption type (`ssl` or `tls`) | No | ssl |
+| `require_https` | Enforce HTTPS connections | No | true |
 
 ### SMTP Providers
 
 #### Gmail
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_ENCRYPTION=ssl
+```php
+$config = [
+    'host' => 'smtp.gmail.com',
+    'username' => 'your-email@gmail.com',
+    'password' => 'your-app-password',
+    'port' => 465,
+    'from' => 'your-email@gmail.com',
+    'encryption' => 'ssl',
+    'require_https' => filter_var('true', FILTER_VALIDATE_BOOLEAN),
+];
 ```
 **Note:** You'll need to use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular Gmail password.
 
 #### SendGrid
-```env
-SMTP_HOST=smtp.sendgrid.net
-SMTP_PORT=587
-SMTP_ENCRYPTION=tls
-SMTP_USERNAME=apikey
-SMTP_PASSWORD=your-sendgrid-api-key
+```php
+$config = [
+    'host' => 'smtp.sendgrid.net',
+    'username' => 'apikey',
+    'password' => 'your-sendgrid-api-key',
+    'port' => 587,
+    'from' => 'your-email@example.com',
+    'encryption' => 'tls',
+    'require_https' => filter_var('true', FILTER_VALIDATE_BOOLEAN),
+];
 ```
 
 #### AWS SES
-```env
-SMTP_HOST=email-smtp.us-east-1.amazonaws.com
-SMTP_PORT=587
-SMTP_ENCRYPTION=tls
+```php
+$config = [
+    'host' => 'email-smtp.us-east-1.amazonaws.com',
+    'username' => 'your-aws-smtp-username',
+    'password' => 'your-aws-smtp-password',
+    'port' => 587,
+    'from' => 'your-email@example.com',
+    'encryption' => 'tls',
+    'require_https' => filter_var('true', FILTER_VALIDATE_BOOLEAN),
+];
 ```
 
 ## Security Considerations
 
-1. **HTTPS**: The server enforces HTTPS by default. Set `REQUIRE_HTTPS=false` in `.env` to disable (not recommended for production).
+1. **HTTPS**: The server enforces HTTPS by default. Set `require_https` to `false` in `config.php` to disable (not recommended for production).
 
-2. **Environment Variables**: Never commit your `.env` file. It's already in `.gitignore`.
+2. **Configuration File**: Never commit your `config.php` file with real credentials. Consider:
+   - Adding `config.php` to `.gitignore`
+   - Using a `config.php.example` template
+   - Using environment variables or a secure configuration management system
 
 3. **Rate Limiting**: Consider implementing rate limiting in production to prevent abuse.
 
@@ -175,12 +197,14 @@ SMTP_ENCRYPTION=tls
 
 5. **Error Messages**: Error messages are generic to avoid information leakage.
 
+6. **File Permissions**: Ensure `config.php` has appropriate file permissions (e.g., `chmod 600 config.php`).
+
 ## Development
 
 ### Testing Locally
 
 1. Set up a local development environment (XAMPP, MAMP, or PHP built-in server)
-2. Configure your `.env` file
+2. Fill in the configuration parameters in `config.php`
 3. Test with a tool like Postman or cURL
 
 ### Using PHP Built-in Server
@@ -194,6 +218,27 @@ Then test with:
 curl -X POST http://localhost:8000/server.php \
   -H "Content-Type: application/json" \
   -d '{"to":"test@example.com","subject":"Test","body":"Test body"}'
+```
+
+**Note:** For local testing, you may need to set `require_https` to `false` in `config.php`:
+```php
+'require_https' => filter_var('false', FILTER_VALIDATE_BOOLEAN),
+```
+
+## Project Structure
+
+```
+simple-email-server-php/
+├── server.php              # Main API endpoint
+├── config.php              # SMTP configuration (create from example)
+├── config.php.example      # Configuration template
+├── phpmailer/              # PHPMailer library
+│   └── src/
+│       ├── PHPMailer.php
+│       ├── SMTP.php
+│       └── Exception.php
+├── README.md               # This file
+└── LICENSE                 # MIT License
 ```
 
 ## License
@@ -213,4 +258,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Acknowledgments
 
 - [PHPMailer](https://github.com/PHPMailer/PHPMailer) - The email library powering this project
-
