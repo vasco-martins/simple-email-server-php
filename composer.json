@@ -1,0 +1,24 @@
+{
+    "name": "vascomartins/simple-email-server-php",
+    "description": "A lightweight PHP email server using PHPMailer for sending emails via SMTP",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vasco Martins",
+            "email": ""
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "SimpleEmailServer\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
+
